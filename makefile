@@ -1,25 +1,16 @@
-pacman: pacman.o libisentlib.a
-	gcc -Wall pacman.o -o pacman libisentlib.a -lm -lglut -lGL -lX11
+pacman: pacman.o S2DE.o
+	gcc -Wall -o pacman pacman.o S2DE.o -lm -lglut -lGL
+	rm -f *.o
 
-libisentlib.a: BmpLib.o ESLib.o GfxLib.o
-	ar r libisentlib.a BmpLib.o ESLib.o GfxLib.o
-	ranlib libisentlib.a
 
-BmpLib.o: BmpLib.c BmpLib.h OutilsLib.h
-	gcc -Wall -O2 -c BmpLib.c
 
-ESLib.o: ESLib.c ESLib.h ErreurLib.h
-	gcc -Wall -O2 -c ESLib.c
+#pacman
+pacman.o: pacman.c S2DE.h
+	gcc -Wall -O2 -c pacman.c
 
-GfxLib.o: GfxLib.c GfxLib.h ESLib.h
-	gcc -Wall -O2 -c GfxLib.c -I/usr/include/GL
 
-zip:
-	tar -cvzf libisentlib.tgz *.[ch] *.bmp *.pdf makefile
 
-clean:
-	rm -f *~ *.o
-
-deepclean: clean
-	rm -f pacman libisentlib.a
+#S2DE management (use S2DE.o/.h to access to 2D graphic engine)
+S2DE.o: S2DE.c S2DE.h
+	gcc -Wall -O2 -c S2DE.c -I/usr/include/GL
 

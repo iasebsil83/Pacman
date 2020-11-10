@@ -1,16 +1,53 @@
-#include <stdlib.h> // Pour pouvoir utiliser exit()
-#include <stdio.h> // Pour pouvoir utiliser printf()
-#include <math.h> // Pour pouvoir utiliser sin() et cos()
-#include "GfxLib.h" // Seul cet include est necessaire pour faire du graphique
-#include "BmpLib.h" // Cet include permet de manipuler des fichiers BMP
-#include "ESLib.h" // Pour utiliser valeurAleatoire()
+// ---------------- IMPORTATIONS ----------------
 
+//standard
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+
+//calculations
+#include <math.h>
+
+//for the random
+#include <time.h>
+
+//graphics
+#include "S2DE.h"
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------------- DECLARATIONS ----------------
+
+//window
 #define LargeurFenetre 800
 #define HauteurFenetre 400
 
+//game
 #define chunkSize 25
 #define playerMarge 4
 
+
+
+//event variables
+extern int S2DE_mouseState; //mouse
+extern int S2DE_mouseButton;
+extern int S2DE_mouseX;
+extern int S2DE_mouseY;
+extern int S2DE_keyState; //keyboard
+extern short S2DE_key;
+extern int S2DE_newWidth; //resize
+extern int S2DE_newHeight;
+
+//game matrix
 static int ny = 16;
 static int nx = 32;
 static int walls[(int)(16*32)] = { // 0 = yellow ball, 1 is wall, 2 = orange ball, 3 = void
@@ -31,6 +68,9 @@ static int walls[(int)(16*32)] = { // 0 = yellow ball, 1 is wall, 2 = orange bal
 	1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
+
+
+
 //monsters
 static int monstersNbr = 5;
 static float monsters[5][2] = { //{x,y,direction}
@@ -53,37 +93,57 @@ static int monstersColor[5][3] = {
 };
 static const float monstersStep = 2.5;
 static int monstersScore = 0;
+
+
+
 //player
 static float playerX = chunkSize;
 static float playerY = chunkSize;
 static const float playerStep = 2.5;
 static int wantedDirection = 1; //right
 static int direction = 1; //up
+
+
+
 //player mouth
 static float mouthDiv = 4; //4 = open; 2 = close;
 static bool mouthSens = true;
 static const float mouthStep = 0.2;
+
+
+
 //mega mode (eat phantoms)
 static int megaModeTimer = 0;
 static const int megaModeTimerMax = 320;
+
+
+
 //life
 static short int life = 3;
 static int lifeTimer = 0;
 static const int lifeTimerMax = 90;
-//score
-static int score = 0;
-static const int scoreMax = 216;
+
+
+
 //other
+static int score = 0;
 static bool win = false;
 static bool starter = true;
 
-int main(int argc, char **argv){
-	initialiseGfx(argc, argv);
-	prepareFenetreGraphique("Pacman", LargeurFenetre, HauteurFenetre);
-	lanceBoucleEvenements();
-	return 0;
-}
 
+
+
+
+
+
+
+
+
+
+
+// ---------------- UTILITIES ----------------
+
+//utilities
 int rnd(float n){ //<=> round a float to an int
 	if(n > (int)n){
 		return (int)(n+1);
@@ -92,6 +152,32 @@ int rnd(float n){ //<=> round a float to an int
 	}
 }
 
+void circle(float x, float y, float R, int div, int nbr, short int strokes){
+	switch(strokes){
+		case 0: //borders
+			for(int angle=0; angle < nbr; angle++){
+				S2DE_line( x+R*cos(angle*2*M_PI/div)    , y+R*sin(angle*2*M_PI/div),
+						   x+R*cos((angle+1)*2*M_PI/div), y+R*sin((angle+1)*2*M_PI/div) );
+			}
+		break;
+		case 1: //center lines
+			for(int angle=0; angle < nbr; angle++){
+				S2DE_line(x,y, x+R*cos(angle*2*M_PI/div),y+R*sin(angle*2*M_PI/div));
+			}
+		break;
+		case 2: //borders + center lines
+			for(int angle=0; angle < nbr; angle++){
+				S2DE_line(x,y, x+R*cos(angle*2*M_PI/div),y+R*sin(angle*2*M_PI/div));
+				S2DE_line( x+R*cos(angle*2*M_PI/div)    , y+R*sin(angle*2*M_PI/div),
+						   x+R*cos((angle+1)*2*M_PI/div), y+R*sin((angle+1)*2*M_PI/div) );
+			}
+		break;
+	}
+}
+
+
+
+//monsters
 void delMonster(int row){
 	monstersNbr--;
 	for(int a=row; a < monstersNbr; a++){
@@ -135,6 +221,9 @@ bool getOk(float wallX, float wallY, float x, float y, int dir, float step){
 	return true;
 }
 
+
+
+//walls
 bool wallsOk(){ //checkBalls() included
 	float chunkX, chunkY;
 	bool ok = true;
@@ -235,7 +324,7 @@ void checkMonsters(){
 			}
 		}
 		if(monstersDirTimer == 0 || !ok){
-			monstersWantedDir[a] += rnd(4*valeurAleatoire()-2);
+			monstersWantedDir[a] += rnd( (rand() % 4)-2);
 		}
 		if(monstersWantedDir[a] > 3){
 			monstersWantedDir[a] -= 4;
@@ -249,16 +338,129 @@ void checkMonsters(){
 	monstersDirTimer--;
 }
 
-void gestionEvenement(EvenementGfx evenement){
-	static bool pleinEcran = false; // Pour savoir si on est en mode plein ecran ou pas
-	//static DonneesImageRGB *image = NULL;
+
+
+
+
+
+
+
+
+
+
+
+// ---------------- EXECUTION ----------------
+
+//event
+void S2DE_event(int event){
 	float chunkX,chunkY;
-	switch(evenement){
-		case Initialisation:
-			//init mobs
-			demandeTemporisation(17); //<=> 60 fps
+	switch(event){
+
+		//display
+		case S2DE_DISPLAY:
+			S2DE_setColor(0,0,0);
+			S2DE_rectangle(0,0, LargeurFenetre,HauteurFenetre, 1);
+
+			//blocks
+			for(int a=0; a < nx*ny; a++){
+				chunkY = chunkSize*(int)( a / (LargeurFenetre/chunkSize) );
+				chunkX = chunkSize*(int)( a % (LargeurFenetre/chunkSize) );
+				switch(walls[a]){
+					case 0: //if this is a yellow ball
+						S2DE_setColor(255,255,0);
+						S2DE_rectangle(chunkX+chunkSize/3,chunkY+chunkSize/3, chunkX+chunkSize-chunkSize/3,chunkY+chunkSize-chunkSize/3, 1);
+					break;
+					case 1:  //if this is a wall
+						S2DE_setColor(0,0,255);
+						S2DE_rectangle(chunkX,chunkY, chunkX+chunkSize,chunkY+chunkSize, 1);
+					break;
+					case 2: //if this is a orange ball
+						S2DE_setColor(255,100,0);
+						S2DE_rectangle(chunkX+chunkSize/4,chunkY+chunkSize/4, chunkX+chunkSize-chunkSize/4,chunkY+chunkSize-chunkSize/4, 1);
+					break;
+				}
+			}
+			//monsters
+			for(int a=0; a < monstersNbr; a++){
+				if(megaModeTimer != 0){
+					S2DE_setColor(0,0,255);
+				}else{
+					S2DE_setColor(monstersColor[a][0],monstersColor[a][1],monstersColor[a][2]);
+				}
+				S2DE_rectangle(monsters[a][0]+chunkSize/6,monsters[a][1], monsters[a][0]+chunkSize-chunkSize/6,monsters[a][1]+chunkSize-chunkSize/6, 1);
+				S2DE_setColor(255,255,255);
+				S2DE_rectangle(monsters[a][0]+3*chunkSize/12,monsters[a][1]+2*chunkSize/3, monsters[a][0]+5*chunkSize/12,monsters[a][1]+5*chunkSize/12, 1);
+				S2DE_rectangle(monsters[a][0]+7*chunkSize/12+1,monsters[a][1]+2*chunkSize/3, monsters[a][0]+9*chunkSize/12+1,monsters[a][1]+5*chunkSize/12, 1);
+			}
+			//player
+			if(megaModeTimer != 0){
+				S2DE_setColor(255,0,0);
+			}else{
+				S2DE_setColor(255,255,0);
+			}
+			if(lifeTimer == 0 || (lifeTimer > 8 && lifeTimer < 22) || (lifeTimer > 38 && lifeTimer < 52) || (lifeTimer > 68 && lifeTimer < 82) ){
+				circle(playerX+chunkSize/2,playerY+chunkSize/2,chunkSize/2-1,70,70,1);
+				S2DE_setColor(0,0,0);
+				switch(direction){
+					case 0: //up
+						S2DE_triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+chunkSize/mouthDiv,playerY+chunkSize-2, playerX+chunkSize-chunkSize/mouthDiv,playerY+chunkSize-2, 1);
+					break;
+					case 1: //right
+						S2DE_triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+chunkSize-2,playerY+chunkSize/mouthDiv, playerX+chunkSize-2,playerY+chunkSize-chunkSize/mouthDiv, 1);
+					break;
+					case 2: //down
+						S2DE_triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+chunkSize/mouthDiv,playerY+1, playerX+chunkSize-chunkSize/mouthDiv,playerY+1, 1);
+					break;
+					case 3: //left
+						S2DE_triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+1,playerY+chunkSize/mouthDiv, playerX+1,playerY+chunkSize-chunkSize/mouthDiv, 1);
+					break;
+				}
+			}
 		break;
-		case Temporisation: //<=> refresh(values)
+
+
+
+		//keyboard
+		case S2DE_KEYBOARD:
+			//get only keyPress events
+			if(S2DE_keyState == S2DE_KEY_RELEASED)
+				return;
+
+			switch(S2DE_key){
+				case S2DE_KEY_q:
+					S2DE_stop();
+				break;
+				case S2DE_KEY_LEFT:
+					wantedDirection = 3;
+				break;
+				case S2DE_KEY_RIGHT:
+					wantedDirection = 1;
+				break;
+				case S2DE_KEY_DOWN:
+					wantedDirection = 2;
+				break;
+				case S2DE_KEY_UP:
+					wantedDirection = 0;
+				break;
+			}
+		break;
+
+
+
+		//mouse
+		case S2DE_MOUSECLICK:
+		break;
+
+
+
+		//mouse move
+		case S2DE_MOUSEMOVE:
+		break;
+
+
+
+		//timed execution
+		case S2DE_TIMER:
 			if(rnd(playerX)%chunkSize == 0 && rnd(playerY)%chunkSize == 0){ //if we are in the perfect coo matrix
 				direction = wantedDirection; //update the direction
 			}
@@ -297,7 +499,7 @@ void gestionEvenement(EvenementGfx evenement){
 						break;
 					}
 				}
-				rafraichisFenetre();
+				S2DE_refresh();
 				if(mouthSens){
 					mouthDiv += mouthStep;
 				}else{
@@ -308,108 +510,29 @@ void gestionEvenement(EvenementGfx evenement){
 				}
 			}
 		break;
-		case Affichage: //<=> refresh(display)
-			effaceFenetre(0,0,0);
-			//blocks
-			for(int a=0; a < nx*ny; a++){
-				chunkY = chunkSize*(int)( a / (LargeurFenetre/chunkSize) );
-				chunkX = chunkSize*(int)( a % (LargeurFenetre/chunkSize) );
-				switch(walls[a]){
-					case 0: //if this is a yellow ball
-						couleurCourante(255,255,0);
-						rectangle(chunkX+chunkSize/3,chunkY+chunkSize/3, chunkX+chunkSize-chunkSize/3,chunkY+chunkSize-chunkSize/3);
-						//circle(chunkX+chunkSize/2,chunkY+chunkSize/2, chunkSize/3,6,6,1);
-					break;
-					case 1:  //if this is a wall
-						couleurCourante(0,0,255);
-						rectangle(chunkX,chunkY, chunkX+chunkSize,chunkY+chunkSize);
-					break;
-					case 2: //if this is a orange ball
-						couleurCourante(255,100,0);
-						rectangle(chunkX+chunkSize/4,chunkY+chunkSize/4, chunkX+chunkSize-chunkSize/4,chunkY+chunkSize-chunkSize/4);
-						//circle(chunkX+chunkSize/2,chunkY+chunkSize/2, chunkSize/4,6,6,1);
-					break;
-				}
-			}
-			//monsters
-			for(int a=0; a < monstersNbr; a++){
-				if(megaModeTimer != 0){
-					couleurCourante(0,0,255);
-				}else{
-					couleurCourante(monstersColor[a][0],monstersColor[a][1],monstersColor[a][2]);
-				}
-				rectangle(monsters[a][0]+chunkSize/6,monsters[a][1], monsters[a][0]+chunkSize-chunkSize/6,monsters[a][1]+chunkSize-chunkSize/6);
-				couleurCourante(255,255,255);
-				rectangle(monsters[a][0]+3*chunkSize/12,monsters[a][1]+2*chunkSize/3, monsters[a][0]+5*chunkSize/12,monsters[a][1]+5*chunkSize/12);
-				rectangle(monsters[a][0]+7*chunkSize/12+1,monsters[a][1]+2*chunkSize/3, monsters[a][0]+9*chunkSize/12+1,monsters[a][1]+5*chunkSize/12);
-			}
-			//player
-			if(megaModeTimer != 0){
-				couleurCourante(255,0,0);
-			}else{
-				couleurCourante(255,255,0);
-			}
-			if(lifeTimer == 0 || (lifeTimer > 8 && lifeTimer < 22) || (lifeTimer > 38 && lifeTimer < 52) || (lifeTimer > 68 && lifeTimer < 82) ){
-				circle(playerX+chunkSize/2,playerY+chunkSize/2,chunkSize/2-1,70,70,1);
-				couleurCourante(0,0,0);
-				switch(direction){
-					case 0: //up
-						triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+chunkSize/mouthDiv,playerY+chunkSize-2, playerX+chunkSize-chunkSize/mouthDiv,playerY+chunkSize-2);
-					break;
-					case 1: //right
-						triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+chunkSize-2,playerY+chunkSize/mouthDiv, playerX+chunkSize-2,playerY+chunkSize-chunkSize/mouthDiv);
-					break;
-					case 2: //down
-						triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+chunkSize/mouthDiv,playerY+1, playerX+chunkSize-chunkSize/mouthDiv,playerY+1);
-					break;
-					case 3: //left
-						triangle(playerX+chunkSize/2,playerY+chunkSize/2, playerX+1,playerY+chunkSize/mouthDiv, playerX+1,playerY+chunkSize-chunkSize/mouthDiv);
-					break;
-				}
-			}
-		break;
-		case Clavier:
-			switch(caractereClavier()){
-				case 'q':
-					//libereDonneesImageRGB(&image[a]);
-					//On libere la structure image, c'est plus propre, meme si on va sortir du programme juste apres
-					termineBoucleEvenements();
-				break;
-				case 'f':
-					pleinEcran = !pleinEcran; // Changement de mode plein ecran
-					if(pleinEcran){
-						modePleinEcran();
-					}else{
-						redimensionneFenetre(largeurFenetre(), hauteurFenetre());
-					}
-				break;
-			}
-			rafraichisFenetre();
-		break;
-		case ClavierSpecial:
-			switch(toucheClavier()){
-				case ToucheFlecheGauche:
-					wantedDirection = 3; //left
-				break;
-				case ToucheFlecheDroite:
-					wantedDirection = 1; //right
-				break;
-				case ToucheFlecheBas:
-					wantedDirection = 2; //down
-				break;
-				case ToucheFlecheHaut:
-					wantedDirection = 0; //up
-				break;
-			}
-			rafraichisFenetre();
-		break;
-		case BoutonSouris:
-		break;
-		case Souris: // Si la souris est deplacee
-		break;
-		case Inactivite: // Quand aucun message n'est disponible
-		break;
-		case Redimensionnement: // La taille de la fenetre a ete modifie ou on est passe en plein ecran
+
+
+
+		//resize
+		case S2DE_RESIZE:
 		break;
 	}
+}
+
+
+
+// main
+int main(int argc, char **argv){
+
+	//init random
+	srand(time(NULL));
+
+	//init S2DE
+	S2DE_init(argc,argv, "Pacman", LargeurFenetre, HauteurFenetre);
+	S2DE_setTimer(17);
+
+	//launch S2DE
+	S2DE_start();
+
+	return 0;
 }
