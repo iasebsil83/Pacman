@@ -384,6 +384,9 @@ void rectangle(float xCoin1, float yCoin1, float xCoin2, float yCoin2)
 		glVertex2f(xCoin2, yCoin2);
 		glVertex2f(xCoin1, yCoin2);
 	glEnd();
+	glLineWidth(1.f);
+	ligne(xCoin1,yCoin1, xCoin2,yCoin2);
+	glLineWidth(sEpaisseurDeTrait);
 }
 
 /* Affiche une chaine de caracteres de taille donnee a la position specifiee */
