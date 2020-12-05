@@ -3,10 +3,23 @@ This project exists in 2 diferent versions :
  - The older which is the original one using Ghislain OUDINET's GfxLib.
  - The new version which is an adaptation using my own graphical library S2DE.
 
+
+
 These versions are available in the branches of this repository :
 
 https://github.com/iasebsil83/Pacman/tree/GfxLib
 https://github.com/iasebsil83/Pacman/tree/S2DE
+
+
+
+If you want to access to these versions with the command git clone :
+
+- git https://github.com/iasebsil83/pacman
+- cd pacman
+    - git checkout GfxLib
+or
+    - git checkout S2DE
+
 
 Contact     : i.a.sebsil83@gmail.com
 Youtube     : https://www.youtube.com/user/IAsebsil83
