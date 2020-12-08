@@ -38,16 +38,8 @@
 
 
 //event variables
-extern int S2DE_mouseState; //mouse
-extern int S2DE_mouseButton;
-extern int S2DE_mouseX;
-extern int S2DE_mouseY;
 extern int S2DE_keyState; //keyboard
 extern short S2DE_key;
-extern unsigned int S2DE_newWidth; //resize
-extern unsigned int S2DE_newHeight;
-extern unsigned int S2DE_width;
-extern unsigned int S2DE_height;
 
 //game matrix
 static int ny = 16;
