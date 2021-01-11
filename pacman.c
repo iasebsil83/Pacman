@@ -3,8 +3,8 @@
 
     LICENCE :
 
-    C_Pacman
-    Copyright (C) 2018  Sebastien SILVANO
+    C_Pacman_S2DE
+    Copyright (C) 2020  Sebastien SILVANO
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
