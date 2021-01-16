@@ -23,7 +23,6 @@
 #include <stdio.h> // Pour pouvoir utiliser printf()
 #include <math.h> // Pour pouvoir utiliser sin() et cos()
 #include "GfxLib.h" // Seul cet include est necessaire pour faire du graphique
-#include "BmpLib.h" // Cet include permet de manipuler des fichiers BMP
 #include "ESLib.h" // Pour utiliser valeurAleatoire()
 
 #define LargeurFenetre 800
@@ -93,7 +92,6 @@ static int lifeTimer = 0;
 static const int lifeTimerMax = 90;
 //score
 static int score = 0;
-static const int scoreMax = 216;
 //other
 static bool win = false;
 static bool starter = true;
@@ -287,7 +285,7 @@ void gestionEvenement(EvenementGfx evenement){
 				if(starter){
 					starter = false;
 					printf("You win !\n");
-					printf("Score : %d\nscore max possible : 724",(int)(score+monstersScore));
+					printf("Score : %d\nscore max possible : 724\n",(int)(score+monstersScore));
 				}
 			}else if(life == 0){
 				if(starter){

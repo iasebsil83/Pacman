@@ -1,6 +1,17 @@
-pacman: pacman.o libisentlib.a
-	gcc -Wall pacman.o -o pacman libisentlib.a -lm -lglut -lGL -lX11
+#executable
+run: pacman.o libisentlib.a
+	gcc -Wall pacman.o -o run libisentlib.a -lm -lglut -lGL -lX11
+	rm -f *.o libisentlib.a
 
+
+
+#game
+pacman.o: pacman.c GfxLib.h ESLib.h
+	gcc -Wall -c pacman.c -O2
+
+
+
+#GfxLib libraries
 libisentlib.a: BmpLib.o ESLib.o GfxLib.o
 	ar r libisentlib.a BmpLib.o ESLib.o GfxLib.o
 	ranlib libisentlib.a
@@ -16,10 +27,3 @@ GfxLib.o: GfxLib.c GfxLib.h ESLib.h
 
 zip:
 	tar -cvzf libisentlib.tgz *.[ch] *.bmp *.pdf makefile
-
-clean:
-	rm -f *~ *.o
-
-deepclean: clean
-	rm -f pacman libisentlib.a
-
