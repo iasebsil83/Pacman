@@ -14,8 +14,8 @@ https://github.com/iasebsil83/Pacman/tree/S2DE
 
 If you want to access to these versions with the command git clone :
 
-- git https://github.com/iasebsil83/pacman
-- cd pacman
+- git clone https://github.com/iasebsil83/Pacman
+- cd Pacman
     - git checkout GfxLib
 or
     - git checkout S2DE
