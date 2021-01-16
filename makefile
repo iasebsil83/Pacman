@@ -1,10 +1,10 @@
-pacman: pacman.o S2DE.o
-	gcc -Wall -o pacman pacman.o S2DE.o -lm -lglut -lGL
+run: pacman.o S2DE.o
+	gcc -Wall -o run pacman.o S2DE.o -lm -lglut -lGL
 	rm -f *.o
 
 
 
-#pacman
+#game
 pacman.o: pacman.c S2DE.h
 	gcc -Wall -O2 -c pacman.c
 
