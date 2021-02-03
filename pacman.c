@@ -19,11 +19,11 @@
     If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h> // Pour pouvoir utiliser exit()
-#include <stdio.h> // Pour pouvoir utiliser printf()
-#include <math.h> // Pour pouvoir utiliser sin() et cos()
-#include "GfxLib.h" // Seul cet include est necessaire pour faire du graphique
-#include "ESLib.h" // Pour utiliser valeurAleatoire()
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "src/GfxLib.h" //graphics
+#include "src/ESLib.h"
 
 #define LargeurFenetre 800
 #define HauteurFenetre 400
