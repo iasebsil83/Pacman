@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "src/GfxLib.h" //graphics
-#include "src/ESLib.h"
+#include "../lib/GfxLib.h" //graphics
+#include "../lib/ESLib.h"
 
 #define LargeurFenetre 800
 #define HauteurFenetre 400
