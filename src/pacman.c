@@ -33,7 +33,7 @@
 #include <time.h>
 
 //graphics
-#include "S2DE.h"
+#include "../lib/S2DE.h"
 
 
 
@@ -463,13 +463,13 @@ void S2DE_event(int event){
 
 
 		//mouse
-		case S2DE_MOUSECLICK:
+		case S2DE_MOUSE_CLICK:
 		break;
 
 
 
 		//mouse move
-		case S2DE_MOUSEMOVE:
+		case S2DE_MOUSE_MOVE:
 		break;
 
 

@@ -1,1 +1,1 @@
-All the information about S2DE is inside S2DE.c
+All the information about Pacman is inside src/pacman.c.
